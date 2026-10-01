@@ -1,0 +1,12 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<!DOCTYPE html><html lang="vi"><head><title>${book.bookId == 0 ? 'Thêm sách' : 'Cập nhật sách'}</title></head><body>
+<div class="admin-heading"><div><span class="eyebrow">DANH MỤC</span><h1>${book.bookId == 0 ? 'Thêm sách' : 'Cập nhật sách'}</h1></div></div>
+<c:if test="${not empty error}"><div class="notice warning"><c:out value="${error}"/></div></c:if>
+<c:choose><c:when test="${book.bookId == 0}"><c:set var="formAction" value="/admin/books/create"/></c:when><c:otherwise><c:set var="formAction" value="/admin/books/edit"/></c:otherwise></c:choose>
+<form class="admin-form" action="${pageContext.request.contextPath}${formAction}" method="post" enctype="multipart/form-data">
+<c:if test="${book.bookId != 0}"><input type="hidden" name="id" value="${book.bookId}"></c:if>
+<label>Tiêu đề<input name="title" required maxlength="200" value="<c:out value='${book.title}'/>"></label><label>ISBN<input type="number" name="isbn" value="<c:out value='${book.isbn}'/>"></label><label>Nhà xuất bản<input name="publisher" maxlength="100" value="<c:out value='${book.publisher}'/>"></label><label>Giá<input type="number" min="0" step="0.01" name="price" value="<c:out value='${book.price}'/>"></label><label>Ngày xuất bản<input type="date" name="publishDate" value="<c:out value='${book.publishDate}'/>"></label><label>Số lượng<input type="number" min="0" name="quantity" value="<c:out value='${book.quantity}'/>"></label><input type="hidden" name="existingCoverImage" value="<c:out value='${book.coverImage}'/>"><label class="full-field upload-field">Ảnh bìa từ máy<input type="file" name="coverFile" accept="image/jpeg,image/png,image/webp,image/gif"><small>Chọn JPG, PNG, WEBP hoặc GIF; tối đa 5 MB.</small></label><label class="full-field">Mô tả<textarea name="description"><c:out value="${book.description}"/></textarea></label>
+<fieldset class="full-field"><legend>Tác giả</legend><div class="checks"><c:forEach items="${authors}" var="author"><label><input type="checkbox" name="authorIds" value="${author.authorId}" <c:forEach items="${book.authors}" var="selected"><c:if test="${selected.authorId == author.authorId}">checked</c:if></c:forEach>><c:out value="${author.authorName}"/></label></c:forEach></div></fieldset>
+<div class="form-actions full-field"><a class="button secondary" href="${pageContext.request.contextPath}/admin/books">Hủy</a><button class="button primary" type="submit">Lưu sách</button></div></form>
+</body></html>

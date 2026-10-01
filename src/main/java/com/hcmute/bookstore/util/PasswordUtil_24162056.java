@@ -1,0 +1,2 @@
+package com.hcmute.bookstore.util; import java.nio.charset.StandardCharsets; import java.security.*;
+public final class PasswordUtil_24162056 { private PasswordUtil_24162056(){} public static String hash(String x){try{byte[]b=MessageDigest.getInstance("MD5").digest(x.getBytes(StandardCharsets.UTF_8));StringBuilder s=new StringBuilder();for(byte v:b)s.append(String.format("%02x",v));return s.toString();}catch(NoSuchAlgorithmException e){throw new IllegalStateException(e);}} }

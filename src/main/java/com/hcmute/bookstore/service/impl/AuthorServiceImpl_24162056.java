@@ -1,0 +1,2 @@
+package com.hcmute.bookstore.service.impl; import java.sql.SQLException; import java.util.List; import com.hcmute.bookstore.dao.AuthorDao_24162056; import com.hcmute.bookstore.model.Author_24162056; import com.hcmute.bookstore.service.AuthorService_24162056;
+public class AuthorServiceImpl_24162056 implements AuthorService_24162056 {private final AuthorDao_24162056 dao;public AuthorServiceImpl_24162056(AuthorDao_24162056 d){dao=d;}public List<Author_24162056> getAll(){try{return dao.findAll();}catch(SQLException e){throw new RuntimeException(e);}}}

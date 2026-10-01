@@ -1,0 +1,14 @@
+app.name=BookStore
+student.id=24162056
+exam.code=02
+
+database.url=jdbc:sqlserver://localhost:1433;databaseName=BookStore;encrypt=true;trustServerCertificate=true
+database.username=sa
+database.password=YOUR_SQL_SERVER_PASSWORD
+
+mail.enabled=false
+mail.host=smtp.gmail.com
+mail.port=587
+mail.username=
+mail.password=
+mail.from=
