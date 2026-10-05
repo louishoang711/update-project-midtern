@@ -11,6 +11,7 @@ Project Maven WAR sử dụng Servlet, JDBC, JSP, JSTL, SiteMesh 3 và SQL Serve
 - CRUD Books có phân trang tại `/admin/books`.
 - Giỏ hàng theo Session cho User: thêm, cập nhật trong giới hạn tồn kho, xóa từng sách hoặc xóa toàn bộ.
 - Thanh toán COD bằng JDBC transaction: tạo đơn, lưu chi tiết và trừ tồn kho đồng thời.
+- Lịch sử đặt hàng cho User, lọc theo trạng thái đơn hàng.
 - Tất cả class, interface, controller và service đều có hậu tố `_24162056`.
 
 ## Chạy project
@@ -28,3 +29,18 @@ Project Maven WAR sử dụng Servlet, JDBC, JSP, JSTL, SiteMesh 3 và SQL Serve
 
 Tài khoản mẫu sau khi chạy `database.sql`: `admin@bookstore.vn` / `123456` (quản trị) và `user@bookstore.vn` / `123456` (người dùng).
 "# update-project-midtern" 
+
+## Demo trạng thái đơn hàng
+
+Sau khi tạo đơn COD, có thể đổi trạng thái trong SQL Server để quan sát bộ lọc ở `/orders`:
+
+```sql
+UPDATE dbo.orders SET status = 'NEW' WHERE order_id = 1;
+UPDATE dbo.orders SET status = 'CONFIRMED' WHERE order_id = 1;
+UPDATE dbo.orders SET status = 'PREPARING' WHERE order_id = 1;
+UPDATE dbo.orders SET status = 'SHIPPING' WHERE order_id = 1;
+UPDATE dbo.orders SET status = 'DELIVERING' WHERE order_id = 1;
+UPDATE dbo.orders SET status = 'DELIVERED' WHERE order_id = 1;
+UPDATE dbo.orders SET status = 'CANCELLED' WHERE order_id = 1;
+UPDATE dbo.orders SET status = 'RETURNED' WHERE order_id = 1;
+```

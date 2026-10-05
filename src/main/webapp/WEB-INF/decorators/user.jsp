@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><sitemesh:write property="title"/> · ${applicationScope.appName}</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app.css?v=6">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app.css?v=7">
     <sitemesh:write property="head"/>
 </head>
 <body>
@@ -20,6 +20,7 @@
             <a href="${pageContext.request.contextPath}/home">Trang Chủ</a>
             <a href="${pageContext.request.contextPath}/books">Sản phẩm</a>
             <c:if test="${not empty sessionScope.currentUser and not sessionScope.currentUser.admin}">
+                <a href="${pageContext.request.contextPath}/orders">Đơn hàng</a>
                 <a class="cart-link" href="${pageContext.request.contextPath}/cart">
                     Giỏ hàng <span>${empty sessionScope.shoppingCart ? 0 : sessionScope.shoppingCart.totalQuantity}</span>
                 </a>

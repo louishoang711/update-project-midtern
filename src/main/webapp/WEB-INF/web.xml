@@ -43,6 +43,14 @@
         <filter-name>UserAuthorizationFilter_24162056</filter-name>
         <url-pattern>/checkout/*</url-pattern>
     </filter-mapping>
+    <filter-mapping>
+        <filter-name>UserAuthorizationFilter_24162056</filter-name>
+        <url-pattern>/orders</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>UserAuthorizationFilter_24162056</filter-name>
+        <url-pattern>/orders/*</url-pattern>
+    </filter-mapping>
 
     <welcome-file-list>
         <welcome-file>home</welcome-file>

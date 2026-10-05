@@ -41,6 +41,25 @@ public class JdbcOrderDao_24162056 implements OrderDao_24162056 {
             SET quantity = quantity - ?
             WHERE bookid = ? AND quantity >= ?
             """;
+    private static final String SELECT_ORDERS_BY_USER = """
+            SELECT order_id, user_id, receiver_name, receiver_phone, shipping_address,
+                   total_amount, payment_method, status, created_at
+            FROM dbo.orders
+            WHERE user_id = ? AND (? IS NULL OR status = ?)
+            ORDER BY created_at DESC, order_id DESC
+            OFFSET ? ROWS FETCH NEXT ? ROWS ONLY
+            """;
+    private static final String COUNT_ORDERS_BY_USER = """
+            SELECT COUNT(*)
+            FROM dbo.orders
+            WHERE user_id = ? AND (? IS NULL OR status = ?)
+            """;
+    private static final String SELECT_ITEMS_BY_ORDER = """
+            SELECT order_item_id, order_id, book_id, book_title, unit_price, quantity, line_total
+            FROM dbo.order_items
+            WHERE order_id = ?
+            ORDER BY order_item_id
+            """;
 
     @Override
     public Order_24162056 createOrder(int userId, CheckoutForm_24162056 form,
@@ -62,6 +81,36 @@ public class JdbcOrderDao_24162056 implements OrderDao_24162056 {
                 throw exception;
             } finally {
                 connection.setAutoCommit(true);
+            }
+        }
+    }
+
+    @Override
+    public List<Order_24162056> findByUser(int userId, String status, int offset, int limit)
+            throws SQLException {
+        List<Order_24162056> orders = new ArrayList<>();
+        try (Connection connection = DatabaseConnection_24162056.getConnection();
+             PreparedStatement statement = connection.prepareStatement(SELECT_ORDERS_BY_USER)) {
+            bindUserStatusPage(statement, userId, status, offset, limit);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    orders.add(mapOrder(resultSet));
+                }
+            }
+            for (Order_24162056 order : orders) {
+                order.setItems(findItems(connection, order.getOrderId()));
+            }
+        }
+        return orders;
+    }
+
+    @Override
+    public int countByUser(int userId, String status) throws SQLException {
+        try (Connection connection = DatabaseConnection_24162056.getConnection();
+             PreparedStatement statement = connection.prepareStatement(COUNT_ORDERS_BY_USER)) {
+            bindUserStatus(statement, userId, status);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next() ? resultSet.getInt(1) : 0;
             }
         }
     }
@@ -177,5 +226,59 @@ public class JdbcOrderDao_24162056 implements OrderDao_24162056 {
         order.setCreatedAt(createdAt);
         order.setItems(items);
         return order;
+    }
+
+    private void bindUserStatusPage(PreparedStatement statement, int userId, String status,
+                                    int offset, int limit) throws SQLException {
+        bindUserStatus(statement, userId, status);
+        statement.setInt(4, Math.max(0, offset));
+        statement.setInt(5, Math.max(1, limit));
+    }
+
+    private void bindUserStatus(PreparedStatement statement, int userId, String status)
+            throws SQLException {
+        statement.setInt(1, userId);
+        statement.setString(2, status);
+        statement.setString(3, status);
+    }
+
+    private Order_24162056 mapOrder(ResultSet resultSet) throws SQLException {
+        Order_24162056 order = new Order_24162056();
+        order.setOrderId(resultSet.getInt("order_id"));
+        order.setUserId(resultSet.getInt("user_id"));
+        order.setReceiverName(resultSet.getString("receiver_name"));
+        order.setReceiverPhone(resultSet.getString("receiver_phone"));
+        order.setShippingAddress(resultSet.getString("shipping_address"));
+        order.setTotalAmount(resultSet.getBigDecimal("total_amount"));
+        order.setPaymentMethod(resultSet.getString("payment_method"));
+        order.setStatus(resultSet.getString("status"));
+        Timestamp createdAt = resultSet.getTimestamp("created_at");
+        if (createdAt != null) {
+            order.setCreatedAt(createdAt.toLocalDateTime());
+        }
+        return order;
+    }
+
+    private List<OrderItem_24162056> findItems(Connection connection, int orderId)
+            throws SQLException {
+        List<OrderItem_24162056> items = new ArrayList<>();
+        try (PreparedStatement statement = connection.prepareStatement(SELECT_ITEMS_BY_ORDER)) {
+            statement.setInt(1, orderId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    OrderItem_24162056 item = new OrderItem_24162056();
+                    item.setOrderItemId(resultSet.getInt("order_item_id"));
+                    item.setOrderId(resultSet.getInt("order_id"));
+                    int bookId = resultSet.getInt("book_id");
+                    item.setBookId(resultSet.wasNull() ? null : bookId);
+                    item.setBookTitle(resultSet.getString("book_title"));
+                    item.setUnitPrice(resultSet.getBigDecimal("unit_price"));
+                    item.setQuantity(resultSet.getInt("quantity"));
+                    item.setLineTotal(resultSet.getBigDecimal("line_total"));
+                    items.add(item);
+                }
+            }
+        }
+        return items;
     }
 }

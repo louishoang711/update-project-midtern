@@ -2,10 +2,14 @@ package com.hcmute.bookstore.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Order_24162056 {
+    private static final DateTimeFormatter DISPLAY_FORMAT =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
     private int orderId;
     private int userId;
     private String receiverName;
@@ -33,8 +37,37 @@ public class Order_24162056 {
     public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    public String getStatusLabel() { return statusLabel(status); }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public String getCreatedAtText() {
+        return createdAt == null ? "" : createdAt.format(DISPLAY_FORMAT);
+    }
     public List<OrderItem_24162056> getItems() { return items; }
     public void setItems(List<OrderItem_24162056> items) { this.items = items; }
+
+    private String statusLabel(String value) {
+        if ("CONFIRMED".equals(value)) {
+            return "Đã xác nhận";
+        }
+        if ("PREPARING".equals(value)) {
+            return "Chuẩn bị hàng";
+        }
+        if ("SHIPPING".equals(value)) {
+            return "Vận chuyển";
+        }
+        if ("DELIVERING".equals(value)) {
+            return "Giao hàng";
+        }
+        if ("DELIVERED".equals(value)) {
+            return "Đã giao";
+        }
+        if ("CANCELLED".equals(value)) {
+            return "Đơn hàng hủy";
+        }
+        if ("RETURNED".equals(value)) {
+            return "Đơn hàng hoàn";
+        }
+        return "Đơn hàng mới";
+    }
 }
